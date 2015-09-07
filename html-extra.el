@@ -60,6 +60,7 @@
 
      (tagedit-add-experimental-features)
      (add-hook 'html-mode-hook (lambda () (tagedit-mode 1)))
+     ;;(add-hook 'web-mode-hook (lambda () (tagedit-mode 1))) ;;有故障
 
      ;; no paredit equivalents
      (define-key html-mode-map (kbd "M-k") 'tagedit-kill-attribute)
@@ -70,92 +71,95 @@
   (indent-region (point-min) (point-max)))
 
 
+
 ;;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-(require 'sgml-mode)
-(require 'js)
+;; (require 'sgml-mode)
+;; (require 'js)
 
-(defvar cjsp-el-expr-face 'cjsp-el-expr-face
-  "Face name to use for jstl el-expressions.")
-(defface cjsp-el-expr-face
-  '((((class color)) (:foreground "#FFFF00"))
-    (t (:foreground "FFFF00")))
-  "Face for jstl el-expressions.")
+;; (defvar cjsp-el-expr-face 'cjsp-el-expr-face
+;;   "Face name to use for jstl el-expressions.")
+;; (defface cjsp-el-expr-face
+;;   '((((class color)) (:foreground "#FFFF00"))
+;;     (t (:foreground "FFFF00")))
+;;   "Face for jstl el-expressions.")
 
-(defvar cjsp-font-lock-keywords
-  (append
-   sgml-font-lock-keywords-2
-   (list
-    (cons "\${[^}]+}" '(0 cjsp-el-expr-face t t))
-    (cons "{{[^}}]+}}" '(0 cjsp-el-expr-face t t))
-    )))
+;; (defvar cjsp-font-lock-keywords
+;;   (append
+;;    sgml-font-lock-keywords-2
+;;    (list
+;;     (cons "\${[^}]+}" '(0 cjsp-el-expr-face t t))
+;;     (cons "{{[^}}]+}}" '(0 cjsp-el-expr-face t t))
+;;     )))
 
-(defvar cjsp--script-tag-re
-  "<script\\( type=\"text/javascript\"\\)?>")
+;; (defvar cjsp--script-tag-re
+;;   "<script\\( type=\"text/javascript\"\\)?>")
 
-(defun cjsp--in-script-tag (lcon)
-  (and (eq (car lcon) 'text)
-       (cdr lcon)
-       (save-excursion
-         (goto-char (cdr lcon))
-         (looking-back cjsp--script-tag-re))))
+;; (defun cjsp--in-script-tag (lcon)
+;;   (and (eq (car lcon) 'text)
+;;        (cdr lcon)
+;;        (save-excursion
+;;          (goto-char (cdr lcon))
+;;          (looking-back cjsp--script-tag-re))))
 
-(defun cjsp--in-pre-tag (lcon)
-  (and (eq (car lcon) 'text)
-       (cdr lcon)
-       (save-excursion
-         (goto-char (cdr lcon))
-         (looking-back "<pre\\( [^>]*\\)?>\\(<code\\( [^>]*\\)?>\\)?"))))
+;; (defun cjsp--in-pre-tag (lcon)
+;;   (and (eq (car lcon) 'text)
+;;        (cdr lcon)
+;;        (save-excursion
+;;          (goto-char (cdr lcon))
+;;          (looking-back "<pre\\( [^>]*\\)?>\\(<code\\( [^>]*\\)?>\\)?"))))
 
-(defun cjsp--script-indentation ()
-  (if (or (looking-back (concat cjsp--script-tag-re "[\n\t ]+"))
-          (looking-at "</script>"))
-      (sgml-calculate-indent)
-    (max (js--proper-indentation (save-excursion
-                                   (syntax-ppss (point-at-bol))))
-         (sgml-calculate-indent))))
+;; (defun cjsp--script-indentation ()
+;;   (if (or (looking-back (concat cjsp--script-tag-re "[\n\t ]+"))
+;;           (looking-at "</script>"))
+;;       (sgml-calculate-indent)
+;;     (max (js--proper-indentation (save-excursion
+;;                                    (syntax-ppss (point-at-bol))))
+;;          (sgml-calculate-indent))))
 
-(defun cjsp--in-jsp-comment (lcon)
-  (and (eq (car lcon) 'tag)
-       (looking-at "--%")
-       (save-excursion (goto-char (cdr lcon)) (looking-at "<%--"))))
+;; (defun cjsp--in-jsp-comment (lcon)
+;;   (and (eq (car lcon) 'tag)
+;;        (looking-at "--%")
+;;        (save-excursion (goto-char (cdr lcon)) (looking-at "<%--"))))
 
-(defun cjsp--jsp-comment-indentation ()
-  (forward-char 4)
-  (max 0 (- (sgml-calculate-indent) 4)))
+;; (defun cjsp--jsp-comment-indentation ()
+;;   (forward-char 4)
+;;   (max 0 (- (sgml-calculate-indent) 4)))
 
-(defun jsp-calculate-indent (&optional lcon)
-  (unless lcon (setq lcon (sgml-lexical-context)))
-  (cond
-   ((cjsp--in-pre-tag lcon)     nil) ; don't change indent in pre
-   ((cjsp--in-script-tag lcon)  (cjsp--script-indentation))
-   ((cjsp--in-jsp-comment lcon) (cjsp--jsp-comment-indentation))
-   (t                           (sgml-calculate-indent lcon))))
+;; (defun jsp-calculate-indent (&optional lcon)
+;;   (unless lcon (setq lcon (sgml-lexical-context)))
+;;   (cond
+;;    ((cjsp--in-pre-tag lcon)     nil) ; don't change indent in pre
+;;    ((cjsp--in-script-tag lcon)  (cjsp--script-indentation))
+;;    ((cjsp--in-jsp-comment lcon) (cjsp--jsp-comment-indentation))
+;;    (t                           (sgml-calculate-indent lcon))))
 
-(defun jsp-indent-line ()
-  "Indent the current line as jsp."
-  (interactive)
-  (let* ((savep (point))
-         (indent-col
-          (save-excursion
-            (back-to-indentation)
-            (if (>= (point) savep) (setq savep nil))
-            (jsp-calculate-indent))))
-    (if (null indent-col)
-        'noindent
-      (if savep
-          (save-excursion (indent-line-to indent-col))
-        (indent-line-to indent-col)))))
+;; (defun jsp-indent-line ()
+;;   "Indent the current line as jsp."
+;;   (interactive)
+;;   (let* ((savep (point))
+;;          (indent-col
+;;           (save-excursion
+;;             (back-to-indentation)
+;;             (if (>= (point) savep) (setq savep nil))
+;;             (jsp-calculate-indent))))
+;;     (if (null indent-col)
+;;         'noindent
+;;       (if savep
+;;           (save-excursion (indent-line-to indent-col))
+;;         (indent-line-to indent-col)))))
 
-(eval-after-load 'expand-region
-  '(add-to-list 'expand-region-exclude-text-mode-expansions 'crappy-jsp-mode))
+;; (eval-after-load 'expand-region
+;;   '(add-to-list 'expand-region-exclude-text-mode-expansions 'crappy-jsp-mode))
 
-(define-derived-mode crappy-jsp-mode
-  html-mode "Crappy JSP"
-  "Major mode for jsp.
-          \\{jsp-mode-map}"
-  (setq indent-line-function 'jsp-indent-line)
-  (setq font-lock-defaults '((cjsp-font-lock-keywords) nil t)))
+;; (define-derived-mode crappy-jsp-mode
+;;   html-mode "Crappy JSP"
+;;   "Major mode for jsp.
+;;           \\{jsp-mode-map}"
+;;   (setq indent-line-function 'jsp-indent-line)
+;;   (setq font-lock-defaults '((cjsp-font-lock-keywords) nil t)))
 
+;;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+(tagedit-add-experimental-features)
 
 (provide 'html-extra)
 
