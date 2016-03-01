@@ -50,9 +50,9 @@
      (require 'tagedit)
 
      ;; paredit lookalikes
-     (define-key html-mode-map (kbd "s-<right>") 'tagedit-forward-slurp-tag)
+     ;; (define-key html-mode-map (kbd "s-<right>") 'tagedit-forward-slurp-tag)
      (define-key html-mode-map (kbd "C-)") 'tagedit-forward-slurp-tag)
-     (define-key html-mode-map (kbd "s-<left>") 'tagedit-forward-barf-tag)
+     ;;(define-key html-mode-map (kbd "s-<left>") 'tagedit-forward-barf-tag)
      (define-key html-mode-map (kbd "C-}") 'tagedit-forward-barf-tag)
      (define-key html-mode-map (kbd "M-r") 'tagedit-raise-tag)
      (define-key html-mode-map (kbd "s-s") 'tagedit-splice-tag)
